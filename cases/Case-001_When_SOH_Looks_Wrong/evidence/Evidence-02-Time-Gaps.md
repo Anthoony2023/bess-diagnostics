@@ -32,11 +32,12 @@ See evidence image: B0005_Regeneration_Events_Full_Sequence_and_Time_Gaps.png
 - **#166**: Impedance 608 → charge 609 (0:32:11) → impedance 610 (2:46:22) → regen 611 (15:24:46). This one has longest impedance→regen gap 15h 24m.
 
 ## Observation (No causal claim)
-- All 5 regen events are preceded by gaps significantly longer than typical discharge→charge→discharge cadence (~2-4 hours in normal cycles).
-- Prev discharge → Regen: 4h to 19.5h, plus 2 cases >1 day.
-- Prev impedance → Regen: ranges from 0:31:57 to 15:24:46, with 3 cases ~30 min but after longer impedance-charge-impedance clusters.
-- After regen, next discharge gaps are also extended: 4h to 12 days.
-- Pattern: regeneration discharge appears after a cluster containing impedance measurements and/or extended idle time, not immediately after a standard discharge-charge cycle.
+
+- The five regeneration events do not share a single consistent time-gap pattern.
+- Prev discharge → Regen: 4:07:10 to 19:31:37 for three events, while two events have longer gaps of 1 day 9:31:18 and 1 day 13:18:47.
+- Prev impedance → Regen: ranges from 0:31:57 to 15:24:46. Three events occur approximately 30 minutes after an impedance measurement, while the other two have much longer intervals or no preceding impedance record.
+- After regen, the next discharge gaps range from 4:52:29 to 12 days 22:23:44.
+- Observed pattern: regeneration discharge events occur after sequences containing impedance measurements and/or extended time intervals, rather than following an identical standard discharge-charge sequence.
 
 ## Remaining Uncertainty
 - Why longer gaps exist: test protocol pause, scheduled impedance day, or ambient recovery — TBD, not concluded.
