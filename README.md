@@ -12,6 +12,8 @@ Core workflow:
 
 Python is used for computation and evidence generation. AI is used to support interpretation and engineering judgment.
 
+Public site: [bessdiag.com](https://bessdiag.com)
+
 ## Project principles
 
 - Public datasets are used as technical proof-of-capability and methodological benchmarks.
@@ -23,16 +25,27 @@ Python is used for computation and evidence generation. AI is used to support in
 
 ## Current work
 
-### DS-001 — NASA PCoE B0005
+### Done
 
-Day 1 focuses only on data inventory and structural inspection.
+**DS-001 Day 1 inspection** — NASA PCoE B0005 structure, inventory, and schemas. No model. No RUL.
 
-No SOH, degradation, anomaly, or ML conclusion is made at this stage.
+**Case-001 — When SOH Looks Wrong** — A single capacity point is not the irreversible degradation state at that moment. Health = trend + measurement context.
 
-See:
+- External one-pager: `cases/Case-001_When_SOH_Looks_Wrong/Case-001-One-Pager-External.pdf`
+- Full write-up: `cases/Case-001_When_SOH_Looks_Wrong/README.md`
+- Repro notebook: `notebooks/01_B0005_capacity_repro.py`
+
+### Next
+
+DS-002: apply the same inspection → evidence → judgment path on a second dataset closer to module or pack level.
+
+Methods stay empty until a procedure has been tested on more than one dataset.
+
+## See
 
 - `atlas/Dataset_Atlas.xlsx`
 - `datasets/DS-001_B0005/README.md`
 - `inspections/DS-001_B0005/inspection.md`
 - `inspections/DS-001_B0005/evidence.md`
 - `cases/Case-001_When_SOH_Looks_Wrong/README.md`
+- `notebooks/01_B0005_capacity_repro.py`
