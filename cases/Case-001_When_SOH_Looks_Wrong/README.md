@@ -109,19 +109,7 @@ These observations demonstrate changing impedance behavior over the experiment, 
 
 ## Evidence 04 — Ambient Temperature
 
-Ambient temperature at the five identified regeneration events was observed as:
-
-- 24.0°C
-- 24.0°C
-- 24.0°C
-- 24.0°C
-- 24.0°C
-
-No ambient-temperature variation was observed at these events.
-
-Therefore, ambient temperature variation is not supported as an explanation for the observed regeneration events in this dataset.
-
-This does not by itself prove the underlying physical mechanism of the capacity excursions.
+Ambient temperature was controlled at 24°C during the identified regeneration events. No ambient-temperature variation was observed that could explain the events.
 
 ---
 
