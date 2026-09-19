@@ -1,51 +1,70 @@
-# BESS Diagnostics
+# bess-diagnostics
 
-## Battery Data Analytics Lab
+> Not selling a more accurate algorithm. Explaining why field SOH always looks wrong - and how error stacking makes single-point SOH questioned.
 
-BESS Diagnostics is a long-term engineering-focused workspace for analyzing public battery and BESS datasets.
+## What is this repo?
 
-> **Before deciding what is wrong, determine whether the data supports the conclusion.**
+In the field, BESS cannot be disassembled. You have to infer internal health while the system is operating, with measurement uncertainties. A single-point SOH 85% amplifies all errors. Only a trend over time with uncertainty breakdown can exclude errors.
 
-Core workflow:
+**Core thesis: Don't present a single point. Present trend + error bands.**
 
-**Battery Data → Data Quality → Engineering Analysis → Engineering Judgment**
+Lab cherry-picked baseline → No field retest → Representative temp sensor → Short-rest extrapolation (non-linear) → Single-point SOH without uncertainty → Questioned accuracy
 
-Python is used for computation and evidence generation. AI is used to support interpretation and engineering judgment.
+## Cases
 
-Public site: [bessdiag.com](https://bessdiag.com)
+### Case-001: When SOH Looks Wrong (Single Cell)
+- **Dataset:** DS-001 B0005
+- **Question:** Why does using absolute 50mV threshold cause misjudgment?
+- **Method:** Same cell self-comparison, self-baseline Growth%
+- **Conclusion:** Batch variation exists. Use growth rate, not absolute value.
 
-## Project principles
+### Case-002: Why Single-Point SOH is Always Questioned (4 Cells Cross-Validation) [NEW]
+- **Dataset:** DS-002 B0005 / B0006 / B0007 / B0018
+- **Question:** Why is field SOH always questioned by insurance and finance?
+- **11 Field Observations:** See `cases/Case-002_Why_Single_Point_SOH_Is_Questioned/docs/field-observations-11-points_2.md`
+- **Data Evidence:**
+  - Batch variation: Same model, new cell rebound diff 13mV (35 vs 45 vs 32mV)
+  - Old > New: Same cell 35mV -> 85mV (2.4x)
+  - Rest time effect: 5min 25mV vs 30min 40mV (1.6-1.8x, non-linear)
+  - Single vs Trend: Single jumps 38->45->36mV, 5-cycle MA smooth increase
+- **Conclusion:** Field errors are stacked (Batch + time compromise + representative temp + sync). Single-point amplifies errors.
 
-- Public datasets are used as technical proof-of-capability and methodological benchmarks.
-- Dataset inspection comes before modeling.
-- Evidence, observations, hypotheses, and engineering conclusions are kept separate.
-- Large raw datasets are not committed to GitHub.
-- GitHub stores knowledge, metadata, analysis code, and reproducible findings.
-- Colab/Jupyter is the analysis laboratory; GitHub is the durable knowledge base.
+## Repo Map
 
-## Current work
+```
+atlas/ - Project map and case index
+cases/ - Complete case packages (docs + evidence figures + code)
+datasets/ - Data source descriptions (NASA .mat must be downloaded separately, not in repo)
+inspections/ - Inspection reports per dataset
+methods/ - Reusable methods (Growth%, extrapolation)
+notebooks/ - Reproducible Jupyter notebooks
+```
 
-### Done
+## How to Reproduce Case-002
 
-**DS-001 Day 1 inspection** — NASA PCoE B0005 structure, inventory, and schemas. No model. No RUL.
+1. Download NASA Battery Dataset B0005/B0006/B0007/B0018 into `datasets/DS-002_B0006_B0007_B0018/`
+2. `pip install numpy matplotlib scipy`
+3. `python cases/Case-002_Why_Single_Point_SOH_Is_Questioned/src/rebound_analysis.py`
+4. `python cases/Case-002_Why_Single_Point_SOH_Is_Questioned/src/trend_vs_single.py`
+5. Figures will be generated in `evidence/`
 
-**Case-001 — When SOH Looks Wrong** — A single capacity point is not the irreversible degradation state at that moment. Health = trend + measurement context.
+## License
 
-- External one-pager: `cases/Case-001_When_SOH_Looks_Wrong/Case-001-One-Pager-External.pdf`
-- Full write-up: `cases/Case-001_When_SOH_Looks_Wrong/README.md`
-- Repro notebook: `notebooks/01_B0005_capacity_repro.py`
+- **Code** (`src/`, `methods/`, `notebooks/`): MIT License - See `LICENSE-CODE`
+- **Documentation & Articles** (`cases/*/docs/`, `README.md`, `atlas/`): CC BY-NC-ND 4.0 - See `LICENSE-DOCS`
+  - This protects the commercial narrative IP while allowing sharing with attribution for non-commercial use.
 
-### Next
+## Tags / Topics
 
-DS-002: apply the same inspection → evidence → judgment path on a second dataset closer to module or pack level.
+Add these topics to your GitHub repo (Settings → General → Topics): 
+`bess`, `battery-energy-storage`, `state-of-health`, `soh`, `asset-valuation`, `battery-diagnostics`, `data-science`, `energy-storage`
 
-Methods stay empty until a procedure has been tested on more than one dataset.
+## Let's Connect
 
-## See
+I provide independent technical consulting on BESS asset valuation and diagnostic strategies.
 
-- `atlas/Dataset_Atlas.xlsx`
-- `datasets/DS-001_B0005/README.md`
-- `inspections/DS-001_B0005/inspection.md`
-- `inspections/DS-001_B0005/evidence.md`
-- `cases/Case-001_When_SOH_Looks_Wrong/README.md`
-- `notebooks/01_B0005_capacity_repro.py`
+If you are an asset owner, insurer, or operator facing questions about SOH accuracy, valuation gaps, or diagnostic strategy, let's talk.
+
+**Connect with me on LinkedIn or reach out via email for consulting inquiries.**
+
+*Author: Anthony Chou | 20 years field engineering experience | Based in Cypress, TX, US | Focus: BESS field diagnostics*
