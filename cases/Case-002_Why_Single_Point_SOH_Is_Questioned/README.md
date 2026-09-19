@@ -1,510 +1,228 @@
 # Case-002 — Why Single-Point SOH Is Questioned in the Field
 
-> **Field SOH is an indirect estimate made under multiple sources of uncertainty.**
-> A single SOH value should therefore be interpreted together with its measurement
-> context, longitudinal trend, and uncertainty.
+> A public case study on interpreting battery health estimates under real-world measurement uncertainty.
+
+## Engineering Question
+
+Why can a field SOH estimate be questioned even when the underlying algorithm appears reasonable?
+
+The challenge is not simply calculating SOH.
+
+It is determining **how much confidence the available data actually supports**.
 
 ---
 
-## 1. Engineering Question
+## Dataset
 
-### Why can a single-point field SOH estimate be difficult to trust?
+NASA PCoE Battery Dataset
 
-The problem is not simply whether the SOH algorithm is accurate.
-
-In field operation, the battery system may remain assembled and operational while
-internal battery health has to be inferred indirectly.
-
-The resulting estimate can be affected by:
-
-- Cell-to-cell variation
-- Aging state
-- Rest time
-- Temperature
-- Sensor characteristics
-- Voltage/current synchronization
-- Sampling characteristics
-- Measurement methodology
-- Limited ability to retest individual cells
-
-This case separates the evidence into four levels:
-
-1. **NASA Data Evidence** — directly observed in the analyzed NASA dataset
-2. **Field Engineering Observations** — based on practical field experience
-3. **Engineering Inference** — reasonable conclusions derived from the evidence
-4. **Industry Discussion** — broader questions that require additional validation
-
----
-
-# 2. Dataset
-
-### NASA Battery Dataset
-
-Cells analyzed in this case:
+Cells used for cross-cell analysis:
 
 - B0005
 - B0006
 - B0007
 - B0018
 
-B0005 is also the primary dataset used in:
+Source:
 
-**Case-001 — When SOH Looks Wrong**
+https://ti.arc.nasa.gov/tech/dash/groups/pcoe/prognostic-data-repository/
 
-The additional cells are used here to examine whether the observed measurement
-behavior is also present across different cells.
-
-> The NASA dataset is a laboratory single-cell dataset. It is used here as a
-> methodological reference, not as a direct representation of a complete field BESS.
+The raw `.mat` files are not stored in this repository.
 
 ---
 
-# 3. NASA Data Evidence
+# What the Data Shows
 
 ## Evidence A — Aging-Related Rebound Trend
 
-### Observation
+For B0005, voltage rebound after discharge generally increases over the observed aging sequence.
 
-For B0005, rebound magnitude increases over the analyzed aging period.
+Representative observations show rebound values increasing from approximately:
 
-Approximate observed values:
+**35 mV → 85 mV**
 
-- Earlier state: ~35 mV
-- Later state: ~85 mV
+Individual measurements still show short-term variation.
 
-This corresponds to approximately 2.4× growth in the analyzed measurements.
+This demonstrates that the observed signal contains both:
 
-### What the data supports
+- an underlying longitudinal change
+- measurement-to-measurement variation
 
-The B0005 data shows an overall increase in rebound magnitude as the cell ages,
-while individual measurements fluctuate around the longer-term trajectory.
-
-### What this does not prove
-
-The dataset does not establish that rebound is equivalent to directly measured
-impedance, nor does it establish a universal mapping between rebound and SOH.
+The result should therefore not be interpreted from a single observation alone.
 
 ---
 
 ## Evidence B — Cell-to-Cell Variation
 
-### Observation
+Initial rebound measurements differ between cells under the available test conditions.
 
-Different cells show different initial rebound values under the analyzed conditions:
+Representative values:
 
-| Cell | Initial rebound |
-|---|---:|
-| B0005 | ~35 mV |
-| B0006 | ~45 mV |
-| B0007 | ~32 mV |
+- B0005: ~35 mV
+- B0006: ~45 mV
+- B0007: ~32 mV
 
-Observed spread:
+The observed spread is approximately 13 mV.
 
-**13 mV**
+This is an important distinction for field diagnostics:
 
-### What the data supports
+> An absolute threshold that is meaningful for one cell is not automatically transferable to another cell.
 
-Cells with the same nominal model can exhibit different measured rebound values.
-
-### Interpretation
-
-This demonstrates why absolute rebound values should be interpreted carefully
-when comparing different cells.
-
-### Terminology
-
-This case uses:
-
-**Cell-to-cell variation**
-
-rather than:
-
-**Batch variation**
-
-because the available evidence does not establish that B0005, B0006, and B0007
-represent different manufacturing batches.
+Cell-specific baseline and longitudinal behavior can provide additional context.
 
 ---
 
 ## Evidence C — Rest-Time Dependence
 
-### Observation
+The observed rebound changes with the time allowed after discharge.
 
-For the analyzed measurements:
+Representative B0005 observations include approximately:
 
-| Rest time | Rebound |
-|---|---:|
-| 5 min | ~25 mV |
-| 30 min | ~40 mV |
-| 60 min | ~45 mV |
+- 5 min: ~25 mV
+- 30 min: ~40 mV
+- 60 min: ~45 mV
 
-The increase is substantially larger during the earlier part of the rest period.
+The change is not well represented by a simple linear relationship over these intervals.
 
-Approximate comparison:
+This matters because field measurements are often constrained by operational availability.
 
-- 5 → 30 min: ~1.6×
-- 30 → 60 min: smaller additional increase
-
-### What the data supports
-
-Rebound magnitude depends on elapsed rest time.
-
-The observed relationship is not well represented by a simple linear relationship
-over the tested rest intervals.
-
-### What this does not prove
-
-The dataset does not establish a universal 5-minute-to-30-minute conversion formula.
-
-A field correction model would require additional calibration data.
+A measurement taken after a short rest period should therefore be interpreted in the context of the measurement protocol rather than compared directly with a longer-rest reference.
 
 ---
 
-## Evidence D — Single Measurements vs. Observed Trend
+## Evidence D — Single Measurements vs. Longitudinal Trend
 
-### Observation
+Individual rebound measurements show short-term variation.
 
-Individual rebound measurements can move substantially between consecutive observations.
+A moving-average representation provides a smoother view of the observed longitudinal behavior.
 
-Example:
+This does **not** mean that smoothing automatically makes an estimate more accurate.
 
-**38 → 45 → 36 mV**
+Instead, it demonstrates an important diagnostic principle:
 
-while a 5-cycle moving average provides a smoother representation of the observed
-trajectory.
-
-### What the data supports
-
-Single-point measurements contain short-term variation.
-
-A moving average can make the longer-term trajectory easier to observe.
-
-### Important distinction
-
-A smoother curve is not automatically a more accurate measurement.
-
-The moving average does not itself prove that measurement error has been removed,
-nor does it establish the true SOH.
-
-Its value here is that it provides additional temporal context.
+> A single measurement provides limited temporal context; a sequence of measurements provides additional information about the underlying behavior.
 
 ---
 
-# 4. Evidence and Figures
+# Why Field SOH Is Difficult
 
-The case evidence is organized in the `evidence/` directory.
+The laboratory signal itself is only part of the problem.
 
-### Evidence A
-**Old → New rebound behavior**
+In a field BESS, an SOH estimate may depend on multiple layers of uncertainty, including:
 
-Shows the longitudinal rebound behavior of B0005.
+### Baseline uncertainty
 
-### Evidence B
-**Cell-to-cell variation**
+Cells are not necessarily identical even when they share the same nominal model.
 
-Compares the initial rebound values of B0005, B0006, and B0007.
+### Measurement-context uncertainty
 
-### Evidence C
-**Rest-time dependence**
+Rest time, operating condition, temperature, current, and measurement procedure can affect the observed response.
 
-Compares rebound measurements at different rest intervals.
+### Observability limitations
 
-### Evidence D
-**Single-point vs. observed trend**
+The internal state of a battery cannot always be measured directly while the system remains in normal operation.
 
-Compares individual measurements with a 5-cycle moving average.
+### Measurement uncertainty
 
-> Figure filenames may vary as the evidence set is refined. The evidence directory
-> is the source of record for the current figures.
+Sensor accuracy, sampling characteristics, timing, and signal synchronization can affect derived health indicators.
 
----
+### Interpretation uncertainty
 
-# 5. Field Engineering Observations
+An observed change in a health indicator does not automatically identify the physical cause of that change.
 
-The following observations come from field engineering experience.
-
-They are **not directly validated by the NASA single-cell laboratory dataset**.
-
-The detailed 11-point field observations are documented here:
-
-**[11 Field Engineering Observations](docs/field-observations-11-points_2.md)**
-
-The main observations are summarized below.
-
-### 5.1 Cell-Level Impedance Is Difficult to Measure in the Field
-
-Battery health is strongly related to impedance behavior, but accurately measuring
-impedance for every individual cell is difficult once cells are assembled into a
-battery system.
-
-In many field situations, the system cannot simply be opened and each cell removed
-for a controlled impedance measurement.
+These factors can interact rather than appearing independently.
 
 ---
 
-### 5.2 Voltage Rebound Is a Practical Observable
+# Engineering Approach
 
-After discharge, battery voltage can rebound during the subsequent rest period.
+Field SOH should be treated as an **inference problem**, rather than as a direct measurement.
 
-For the same cell, changes in rebound behavior over time may provide useful
-information about changes in battery condition.
+The diagnostic process therefore considers:
 
-However:
+- cell-specific baseline
+- measurement conditions
+- temporal behavior
+- available operating context
+- data quality
+- uncertainty sources
 
-> **Rebound is not equivalent to directly measured impedance.**
+before assigning confidence to an SOH estimate.
 
----
+The objective is not simply to produce another SOH number.
 
-### 5.3 Field Baselines Are Better Established Per Cell or Per System
+It is to determine:
 
-Because different cells can have different initial characteristics, applying one
-absolute threshold to every cell can be difficult to interpret.
-
-A practical field approach is to establish a baseline for the individual cell,
-module, rack, or system and monitor relative change over time.
-
----
-
-### 5.4 Rest Time Is an Operational Compromise
-
-Longer rest periods provide more opportunity for voltage relaxation to develop.
-
-Laboratory testing can use extended rest periods more easily than an operating BESS.
-
-In field operation, however, shutting down equipment for a long diagnostic test has
-an operational cost.
-
-Diagnostic duration therefore represents a trade-off between measurement quality
-and system availability.
-
-A 20–30 minute diagnostic window is an engineering operating assumption in this
-case, not a universal requirement.
+> **What does the available data support, and what does it not support?**
 
 ---
 
-### 5.5 Temperature Measurements May Not Represent Every Cell
+# Implication for BESS Diagnostics
 
-In an assembled module or battery bank, temperature sensors are generally not
-located on every cell.
+For asset or operational decisions, a single SOH value can hide important context.
 
-A sensor near one location may therefore not represent cells located elsewhere in
-the battery system.
+A more useful diagnostic view considers:
 
-Temperature compensation based on limited sensor coverage can consequently carry
-spatial uncertainty.
+**SOH estimate + measurement context + longitudinal behavior + uncertainty**
 
----
+rather than treating the SOH number as an isolated ground truth.
 
-### 5.6 Measurement Instrumentation Adds Uncertainty
-
-Dynamic battery measurements are affected by factors such as:
-
-- Sensor accuracy
-- Voltage/current synchronization
-- Sampling rate
-- Measurement resolution
-- Measurement timing
-
-These factors can affect estimates derived from dynamic voltage/current behavior.
+The exact uncertainty model, correction method, thresholds, and customer-specific diagnostic workflow depend on the available system data and are outside the scope of this public case study.
 
 ---
 
-### 5.7 Full Retesting of Every Cell Is Often Impractical
+# Limitations
 
-In an operating energy-storage system, removing and fully retesting every cell may
-be impractical because of:
+This case uses laboratory single-cell data.
 
-- Time
-- Labor
-- System availability
-- Cost
+It does not directly reproduce:
 
-Field diagnostics therefore often have to work with the data already available from
-the operating system.
+- multi-cell BESS operation
+- module-level thermal gradients
+- BMS / EMS / PCS interactions
+- field sensor placement
+- real-world communication timing
+- operational constraints of an installed energy-storage system
 
----
-
-# 6. Engineering Inferences
-
-The following conclusions are reasonable engineering inferences from the NASA
-observations combined with the field constraints above.
-
-They are **not direct experimental conclusions from the NASA dataset**.
+Field engineering observations are therefore presented as engineering context, not as conclusions proven by the NASA dataset.
 
 ---
 
-## 6.1 Rebound May Be Used as an Indirect Health Indicator
+# Engineering Takeaway
 
-The observed relationship between rebound behavior and aging makes rebound a
-potential indirect indicator of battery condition.
+A field SOH estimate should be interpreted together with its:
 
-However:
+**measurement context, longitudinal behavior, and uncertainty sources.**
 
-> **Rebound ≠ directly measured impedance.**
+The practical challenge is not only calculating SOH.
 
-A field diagnostic method should therefore treat rebound as an indirect signal
-rather than as a direct impedance measurement.
+It is determining **how much confidence the available data supports**.
 
 ---
 
-## 6.2 Cell-Specific Baselines May Be More Informative Than Absolute Thresholds
+# Reproduction
 
-The observed cell-to-cell variation means that two cells can have different initial
-rebound values.
+The repository contains supporting analysis material for the case.
 
-Therefore, a practical diagnostic method may benefit from tracking each cell
-against its own baseline rather than applying one absolute threshold to all cells.
+The NASA `.mat` files are not included in the repository.
 
-Conceptually:
-
-**Baseline → Current value → Relative Growth**
-
-can provide more context than:
-
-**Current value → Fixed threshold**
-
-This is an engineering methodology, not a universal diagnostic rule established
-by the NASA dataset.
+Current analysis scripts are maintained as supporting work and may not reproduce every figure in the case automatically.
 
 ---
 
-## 6.3 Short-Rest Measurements May Require Empirical Correction
-
-The NASA data shows that rebound depends strongly on rest time and that the observed
-change is not well represented by a simple linear relationship across the tested
-intervals.
-
-Therefore, if a field system only provides a short diagnostic window, a practical
-implementation may require:
-
-- Time-dependent lookup tables
-- Empirical calibration
-- Regression models
-- Other validated correction methods
-
-The appropriate method cannot be selected from this dataset alone.
-
----
-
-## 6.4 Temperature Compensation Requires Representative Temperature Data
-
-If only a limited number of temperature sensors are available, applying a
-temperature correction to the entire battery based on one measurement may introduce
-uncertainty.
-
-A practical field method therefore needs to consider both:
-
-**Temperature correction**
-
-and
-
-**Temperature representativeness.**
-
----
-
-## 6.5 Field SOH Is a Multi-Uncertainty Inference Problem
-
-The combination of:
-
-- Cell-to-cell variation
-- Baseline differences
-- Rest-time dependence
-- Temperature uncertainty
-- Sensor accuracy
-- Voltage/current synchronization
-- Sampling characteristics
-- Short-rest extrapolation
-- Limited ability to retest individual cells
-
-means that field SOH should be treated as an indirect inference rather than an
-absolute ground-truth measurement.
-
-This is the central engineering inference of this case.
-
----
-
-# 7. Cross-Validation — Self-Contradiction Check
-
-| Claim | Evidence / Basis | Status | Interpretation |
-|---|---|---|---|
-| Rebound is related to battery condition | B0005 aging trend | Supported with limitation | Do not equate rebound with impedance |
-| Older B0005 shows larger rebound | 35 → 85 mV | NASA evidence | Self-comparison; individual points still fluctuate |
-| Different cells have different initial rebound | 35 / 45 / 32 mV | NASA evidence | Supports caution with absolute cross-cell thresholds |
-| Rest time affects rebound | 25 / 40 / 45 mV | NASA evidence | Simple linear extrapolation is insufficient across tested intervals |
-| Short-rest correction may be needed | Rest-time behavior + field constraint | Engineering inference | Requires additional calibration |
-| Temperature may introduce uncertainty | Field measurement configuration | Field observation | Not demonstrated by NASA single-cell data |
-| Single measurements fluctuate | Individual rebound observations | NASA evidence | Variation should not automatically be labeled measurement error |
-| Moving average shows the longer-term trajectory more clearly | 5-cycle moving average | NASA evidence + interpretation | Smoothing improves visualization, not necessarily accuracy |
-| Trend provides more context than a single point | Longitudinal observations | Engineering inference | Does not mean trend automatically equals ground truth |
-| Field SOH contains stacked uncertainties | Multiple field constraints | Engineering inference | Central engineering interpretation |
-| SOH should include uncertainty/context | Measurement and reporting logic | Engineering inference | Numerical uncertainty requires a validated methodology |
-| Industry reporting can affect interpretation | Industry discussion | Discussion | Requires evidence beyond this dataset |
-
----
-
-# 8. Implication for Asset Valuation
-
-A single SOH number should not be interpreted without understanding how it was
-measured.
-
-A more informative asset-health representation could include:
-
-1. SOH estimate
-2. Historical trend
-3. Measurement conditions
-4. Data quality
-5. Model assumptions
-6. Uncertainty range
-7. Sources of uncertainty
-
-For example:
-
-> **SOH = 85% ± uncertainty**
-
-is conceptually more informative than:
-
-> **SOH = 85%**
-
-provided that the uncertainty is supported by a valid methodology.
-
-The purpose is not to make an SOH estimate look more conservative or more optimistic.
-
-The purpose is to make the basis and limitations of the estimate visible.
-
----
-
-# 9. Reproduction and Execution
-
-## Current status
-
-The evidence in this case was developed from the NASA battery data using Python
-analysis.
-
-The repository contains analysis scripts under `src/`.
-
-### Current scripts
-
-- `src/rebound_analysis.py`
-- `src/trend_vs_single.py`
-
-### Important reproducibility note
-
-`trend_vs_single.py` currently loads summary information and prints selected values.
-It does **not yet contain the complete plotting implementation** used to generate
-the Evidence D figure.
-
-Therefore, it should currently be treated as an analysis placeholder rather than
-a complete one-command reproduction script.
-
-The repository will be updated when the plotting and data-generation pipeline is
-fully reproducible.
-
-### Required analysis environment
-
-The analysis uses standard Python scientific-computing tools, including:
+# Repository Structure
 
 ```text
-Python
-NumPy
-SciPy
-Matplotlib
+Case-002_Why_Single_Point_SOH_Is_Questioned/
+│
+├── README.md
+│
+├── docs/
+│   └── field-observations-11-points_2.md
+│
+├── evidence/
+│   └── Supporting figures and analysis outputs
+│
+└── src/
+    ├── rebound_analysis.py
+    └── trend_vs_single.py
