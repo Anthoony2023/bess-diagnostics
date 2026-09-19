@@ -1,62 +1,68 @@
 # bess-diagnostics
 
-> Not selling a more accurate algorithm. Explaining why single-point SOH is always questioned - and how to present it with trend + error bands.
+> Public battery and BESS data, analyzed from an engineering rather than purely algorithmic perspective.
+
+**Before deciding what is wrong, determine whether the data supports the conclusion.**
 
 ## What is this repo?
 
-In the field, BESS cannot be disassembled. You have to infer internal health while the system is operating, with measurement uncertainties. A single-point SOH 85% amplifies all errors. Only a trend over time with uncertainty breakdown can exclude errors.
+BESS diagnostics often requires inferring battery and system health from indirect measurements collected while the system remains in operation.
 
-**Core thesis: Don't present a single point. Present trend + error bands.**
+A single SOH value can hide important measurement context, operating conditions, and uncertainty.
 
-Lab cherry-picked baseline → No field retest → Representative temp sensor → Short-rest extrapolation (non-linear) → Single-point SOH without uncertainty → Questioned accuracy
+This repository explores these problems through public battery and BESS datasets.
+
+**Core approach: Data → Context → Analysis → Engineering Decision**
+
+The goal is not simply to produce another health estimate, but to understand what the available data can — and cannot — support.
 
 ## Cases
 
-### Case-001: When SOH Looks Wrong (Single Cell)
-- **Dataset:** DS-001 B0005
-- **Question:** Why does using absolute 50mV threshold cause misjudgment?
-- **Method:** Same cell self-comparison, self-baseline Growth%
-- **Conclusion:** Batch variation exists. Use growth rate, not absolute value.
+### Case-001: When SOH Looks Wrong
 
-### Case-002: Why Single-Point SOH is Always Questioned (4 Cells Cross-Validation)
-- **Dataset:** DS-002 B0005 / B0006 / B0007 / B0018
-- **Question:** Why is field SOH always questioned by insurance and finance?
-- **11 Field Observations:** See `cases/Case-002_Why_Single_Point_SOH_Is_Questioned/docs/field-observations-11-points_2.md`
-- **Data Evidence:**
-  - Batch variation: Same model, new cell rebound diff 13mV (35 vs 45 vs 32mV)
-  - Old > New: Same cell 35mV -> 85mV (2.4x)
-  - Rest time effect: 5min 25mV vs 30min 40mV (1.6-1.8x, non-linear)
-  - Single vs Trend: Single jumps 38->45->36mV, 5-cycle MA smooth increase
-- **Conclusion:** Field errors are stacked (Batch + time compromise + representative temp + sync). Single-point amplifies errors.
+- **Dataset:** NASA PCoE B0005
+- **Question:** Can a single capacity measurement be trusted as a direct indicator of battery degradation?
+- **Focus:** Capacity trend, measurement timing, impedance behavior, and operating context
+- **Finding:** Capacity measurements can show short-term upward excursions within an overall declining trend. Measurement context matters when interpreting apparent health changes.
+
+### Case-002: Why Single-Point SOH Is Questioned in the Field
+
+- **Dataset:** NASA PCoE B0005 / B0006 / B0007 / B0018
+- **Question:** Why can a field SOH estimate be questioned even when the underlying algorithm appears reasonable?
+- **Focus:** Cell-to-cell variation, measurement timing, rest-time dependence, and longitudinal behavior
+- **Data evidence:**
+  - Different cells show different initial rebound values under the available test conditions.
+  - B0005 shows an increase in rebound over the observed aging sequence.
+  - Rebound changes with rest time and is not well represented by a simple linear relationship over the observed intervals.
+  - Individual measurements show short-term variation, while a longitudinal view provides additional temporal context.
+- **Finding:** Field SOH should be interpreted together with measurement context, longitudinal behavior, and uncertainty sources.
+
+## Engineering Perspective
+
+Field battery diagnostics may involve several interacting sources of uncertainty:
+
+- Cell-specific baseline differences
+- Measurement conditions and rest time
+- Temperature and operating conditions
+- Sensor accuracy and sampling characteristics
+- Timing and signal synchronization
+- Limited observability of internal battery state
+- Uncertainty in interpreting derived health indicators
+
+The practical engineering question is therefore not only:
+
+> What is the SOH?
+
+but also:
+
+> **How much confidence does the available data support for that SOH estimate?**
+
+Detailed diagnostic methods, correction models, thresholds, and customer-specific workflows are intentionally not published as part of these public case studies.
 
 ## Repo Map
 
-```
-atlas/ - Project map and case index
-cases/ - Complete case packages (docs + evidence figures + src)
-methods/ - Reusable methods (Growth%, extrapolation)
-notebooks/ - Reproducible Jupyter notebooks
-```
-
-## How to Reproduce Case-002
-
-1. Download NASA Battery Dataset B0005/B0006/B0007/B0018
-2. `pip install numpy matplotlib scipy`
-3. `python cases/Case-002_Why_Single_Point_SOH_Is_Questioned/src/rebound_analysis.py`
-4. `python cases/Case-002_Why_Single_Point_SOH_Is_Questioned/src/trend_vs_single.py`
-5. Figures will be generated in `evidence/`
-
-## License
-
-- **Code** (`src/`, `methods/`, `notebooks/`): MIT License - See `LICENSE-CODE`
-- **Documentation & Articles** (`cases/*/docs/`, `README.md`, `atlas/`): CC BY-NC-ND 4.0 - See `LICENSE-DOCS`
-
-## Let's Connect
-
-I provide independent technical consulting on BESS asset valuation and diagnostic strategies.
-
-If you are an asset owner, insurer, or operator facing questions about SOH accuracy, valuation gaps, or diagnostic strategy, let's talk.
-
-**Connect via LinkedIn or email for consulting inquiries.**
-
-*Author: Anthony Chou | 20 years field engineering experience | Based in Cypress, TX, US | Focus: BESS field diagnostics*
+```text
+atlas/       - Dataset and project map
+cases/       - Technical case studies and supporting evidence
+methods/     - Reusable analysis methods
+notebooks/   - Reproducible analysis notebooks
