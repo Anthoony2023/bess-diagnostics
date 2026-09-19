@@ -1,6 +1,6 @@
 # bess-diagnostics
 
-> Not selling a more accurate algorithm. Explaining why field SOH always looks wrong - and how error stacking makes single-point SOH questioned.
+> Not selling a more accurate algorithm. Explaining why single-point SOH is always questioned - and how to present it with trend + error bands.
 
 ## What is this repo?
 
@@ -21,12 +21,12 @@ Lab cherry-picked baseline → No field retest → Representative temp sensor �
 ### Case-002: Why Single-Point SOH is Always Questioned (4 Cells Cross-Validation)
 - **Dataset:** DS-002 B0005 / B0006 / B0007 / B0018
 - **Question:** Why is field SOH always questioned by insurance and finance?
-- **11 Field Observations:** See `cases/Case-002_Why_Single_Point_SOH_Is_Questioned/docs/field-observations-11-points_2.md`
+- **11 Field Observations:** See `[STRIPPED 85 bytes].md`
 - **Data Evidence:**
-  - Batch variation: Same model, new cell rebound diff 13mV (35 vs 45 vs 32mV)
-  - Old > New: Same cell 35mV -> 85mV (2.4x)
-  - Rest time effect: 5min 25mV vs 30min 40mV (1.6-1.8x, non-linear)
-  - Single vs Trend: Single jumps 38->45->36mV, 5-cycle MA smooth increase
+    - Batch variation: Same model, new cell rebound diff 13mV (35 vs 45 vs 32mV)
+    - Old > New: Same cell 35mV -> 85mV (2.4x)
+    - Rest time effect: 5min 25mV vs 30min 40mV (1.6-1.8x, non-linear)
+    - Single vs Trend: Single jumps 38->45->36mV, 5-cycle MA smooth increase
 - **Conclusion:** Field errors are stacked (Batch + time compromise + representative temp + sync). Single-point amplifies errors.
 
 ## Repo Map
