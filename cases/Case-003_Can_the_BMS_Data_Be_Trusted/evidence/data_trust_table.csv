@@ -1,0 +1,11 @@
+signal,trust_assessment,evidence,caveat
+UTC timestamps / cross-stream pairing,Usable within paired analyses after continuity checks,Paired annual analyses reported zero row-wise timestamp mismatches; DCIR SOC exact-match about 98-100%.,Does not prove zero missing samples relative to an external clock or zero physical sampling delay.
+Instantaneous BMS voltage/current,Strong internal consistency,VxI cross-check reproduces BMS power scale/sign across all years.,Not independent calibration.
+BMS DC power value,Supports kW-scale analytical interpretation with quality masks,Numerically kW-scale; raw-as-kW median error about 0.18-0.46%.,Source metadata says W; preserve the inconsistency in provenance.
+BMS SOC,Operational covariate only,Useful for exact-timestamp condition filtering.,Proprietary estimate; not independently calibrated SOH/capacity truth.
+BMS cumulative energy counters,Do not use raw,Four published one-sample jump-and-return excerpts satisfy exact 16-bit word-swap arithmetic.,Public excerpts have partial locators; root cause is not universal or layer-specific.
+BSC reconstructed energy,Derived AC-energy reference; align integration support before comparison,Derived from AC power integration with explicit gap handling.,Not independent validation of AC power; source-export reconstruction rules must not be assumed identical to this case integration.
+Recorded annual command/throughput,Operating evidence,Actual and recorded command energy fall together in 2022-2024.,Does not identify why upstream commands changed.
+Common-condition slow-ramp tracking,Useful inside the observed envelope,Bin-level tracking and support hours are published.,Cannot establish performance outside the envelope; sparse high-power bins are non-representative.
+Residual AC/DC/setpoint comparison,Diagnostic only,Fine common-cell comparison exposes a smaller discrepancy.,AC/DC >1 prevents direct efficiency or battery-loss attribution.
+Field DCIR,Apparent string-path health-related proxy with caveats,2022->2024 common-condition-filtered median rises about 15%.,"Not isolated cell resistance, distribution-matched HPPC, or direct capacity loss."

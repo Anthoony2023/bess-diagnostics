@@ -1,0 +1,4 @@
+year,charge_MWh,discharge_MWh,abs_throughput_MWh,command_abs_MWh,actual_abs_over_command_abs,pq_mode_active_hours,tracking_MAE_kW_ge50,tracking_same_sign_pct_ge50,soc_p05_pct,soc_p50_pct,soc_p95_pct,pq_mode_source_flag
+2022,116.873669,91.887892,208.761561,214.215317,0.97454,1349.1375,17.976477,97.913812,38,53,70,flag_fcr_active_bsc / x_BSC_Opmode_PQ
+2023,52.386039,39.557087,91.943126,95.538679,0.962365,723.165278,12.591219,97.879253,44,57,69,flag_fcr_active_bsc / x_BSC_Opmode_PQ
+2024,27.368438,18.652352,46.020791,48.330565,0.952209,587.318889,13.277743,98.113341,54,63,69,flag_fcr_active_bsc / x_BSC_Opmode_PQ
